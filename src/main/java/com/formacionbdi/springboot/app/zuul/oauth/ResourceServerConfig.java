@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import java.util.Base64;
 
 @RefreshScope
 @Configuration
@@ -37,6 +38,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers("/api/security/oauth/**").permitAll()
 		.antMatchers(HttpMethod.GET, "/api/productos/listar", "/api/items/listar", "/api/usuarios/usuarios").permitAll()
+		.antMatchers(HttpMethod.POST, "/api/productos/crear").permitAll()
 		.antMatchers(HttpMethod.GET, "/api/productos/ver/{id}", 
 				"/api/items/ver/{id}/cantidad/{cantidad}", 
 				"/api/usuarios/usuarios/{id}").hasAnyRole("ADMIN", "USER")
@@ -73,10 +75,22 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
 	}
 
 	@Bean
-	public JwtAccessTokenConverter accessTokenConverter() {
+	public JwtAccessTokenConverter accessTokenConverter2() {
 		JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();
 		tokenConverter.setSigningKey(jwtKey);
 		return tokenConverter;
 	}
+	
+	@Bean
+	public JwtAccessTokenConverter accessTokenConverter() {
+	    JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();
+
+	    String llaveBase64 = Base64.getEncoder().encodeToString(jwtKey.getBytes());
+
+	    tokenConverter.setSigningKey(llaveBase64);
+	    return tokenConverter;
+	}
+
+	
 
 }
